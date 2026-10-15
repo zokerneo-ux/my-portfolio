@@ -141,14 +141,7 @@
   <section id="guestbook">
     <h2>コメント</h2>
     <div class="gb">
-      <form id="gbf">
-        <label for="gn">お名前</label>
-        <input id="gn" maxlength="30" required autocomplete="off">
-        <label for="gm">コメントを残す</label>
-        <textarea id="gm" rows="3" maxlength="140" required></textarea>
-        <button class="btn" type="submit">コメントを投稿</button>
-      </form>
-      <div class="notes" id="notes" aria-live="polite"></div>
+      <div id="disqus_thread"></div>
     </div>
   </section>
 
@@ -163,5 +156,21 @@
 <footer>Made by Alex Rivera for Showcase Night</footer>
 
 <script src="script.js"></script>
+<script>
+  var disqus_config = function () {
+    var pageUrl = new URL(window.location.href);
+    pageUrl.search = '';
+    pageUrl.hash = '';
+    this.page.url = pageUrl.href;
+    this.page.identifier = 'portfolio-guestbook';
+  };
+  (function () {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zak.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', String(Date.now()));
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
 </body>
 </html>

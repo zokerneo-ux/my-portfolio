@@ -63,32 +63,4 @@
     ci+=del?-1:1;setTimeout(tick,del?40:80);
   }
   if(reduce){t.textContent=words[0]}else{tick()}
-
-  var notes=[];
-  try{
-    var sv=JSON.parse(localStorage.getItem('gb')||'null');
-    if(Array.isArray(sv)){
-      notes=sv.filter(function(x){
-        return !((x.n==='Ms. Patel'&&x.m==='The lunch menu app is brilliant. Please never go back to the PDF!')||
-          (x.n==='Jordan'&&x.m==='Your robotics logo is on my laptop now.'));
-      });
-      if(notes.length!==sv.length)localStorage.setItem('gb',JSON.stringify(notes));
-    }
-  }catch(e){}
-  var box=document.getElementById('notes');
-  function draw(){
-    box.textContent='';
-    notes.forEach(function(x,i){
-      var d=document.createElement('div');d.className='note';d.style.setProperty('--r',((i*37%7)-3)+'deg');
-      d.appendChild(document.createTextNode(x.m));var b=document.createElement('b');b.textContent='– '+x.n;d.appendChild(b);box.appendChild(d);
-    });
-  }
-  draw();
-  document.getElementById('gbf').addEventListener('submit',function(e){
-    e.preventDefault();
-    var n=document.getElementById('gn'),m=document.getElementById('gm');
-    notes.unshift({n:n.value.trim(),m:m.value.trim()});notes=notes.slice(0,12);
-    try{localStorage.setItem('gb',JSON.stringify(notes))}catch(x){}
-    draw();n.value='';m.value='';
-  });
 })();
