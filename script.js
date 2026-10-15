@@ -63,4 +63,66 @@
     ci+=del?-1:1;setTimeout(tick,del?40:80);
   }
   if(reduce){t.textContent=words[0]}else{tick()}
+
+  var commentForm=document.getElementById('comment-form');
+  var commentList=document.getElementById('comment-list');
+  var commentStatus=document.getElementById('comment-status');
+  var commentName=document.getElementById('comment-name');
+  var commentText=document.getElementById('comment-text');
+  var commentStorageKey='portfolio-comments';
+  var comments=[];
+
+  function validComments(value){
+    return Array.isArray(value)?value.filter(function(comment){
+      return comment&&typeof comment.name==='string'&&typeof comment.text==='string';
+    }):[];
+  }
+  function renderComments(){
+    commentList.textContent='';
+    comments.forEach(function(comment){
+      var article=document.createElement('article');
+      article.className='comment';
+      var text=document.createElement('p');
+      text.textContent=comment.text;
+      var author=document.createElement('b');
+      author.className='comment-author';
+      author.textContent='– '+comment.name;
+      article.appendChild(text);
+      article.appendChild(author);
+      commentList.appendChild(article);
+    });
+  }
+  try{
+    var savedComments=localStorage.getItem(commentStorageKey);
+    if(savedComments)comments=validComments(JSON.parse(savedComments));
+    renderComments();
+  }catch(error){
+    commentStatus.textContent='コメントを読み込めませんでした。ブラウザーの保存機能を確認してください。';
+  }
+  commentForm.addEventListener('submit',function(event){
+    event.preventDefault();
+    var name=commentName.value.trim();
+    var text=commentText.value.trim();
+    if(!name||!text)return;
+    comments.unshift({name:name,text:text});
+    renderComments();
+    commentName.value='';
+    commentText.value='';
+    try{
+      localStorage.setItem(commentStorageKey,JSON.stringify(comments));
+      commentStatus.textContent='コメントを投稿しました。';
+    }catch(error){
+      commentStatus.textContent='コメントを表示しましたが、保存できませんでした。ブラウザーの保存機能を確認してください。';
+    }
+  });
+  addEventListener('storage',function(event){
+    if(event.key!==commentStorageKey&&event.key!==null)return;
+    try{
+      comments=event.newValue?validComments(JSON.parse(event.newValue)):[];
+      renderComments();
+      commentStatus.textContent='コメント一覧を更新しました。';
+    }catch(error){
+      commentStatus.textContent='コメントを更新できませんでした。保存データを読み込めません。';
+    }
+  });
 })();

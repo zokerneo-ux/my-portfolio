@@ -15,7 +15,7 @@
     <strong>鎌山祭</strong>
     <a href="#about">自己紹介</a>
     <a href="#projects">作品</a>
-    <a href="#guestbook">コメント</a>
+    <a href="#comments">コメント</a>
     <a href="#contact">連絡先</a>
     <button id="theme" type="button" aria-label="Toggle dark mode">Dark mode</button>
   </div>
@@ -138,10 +138,18 @@
     </dialog>
   </section>
 
-  <section id="guestbook">
+  <section id="comments">
     <h2>コメント</h2>
     <div class="gb">
-      <div id="disqus_thread"></div>
+      <form id="comment-form" class="comment-form">
+        <label for="comment-name">お名前</label>
+        <input id="comment-name" name="name" maxlength="40" autocomplete="name" required>
+        <label for="comment-text">コメントを残す</label>
+        <textarea id="comment-text" name="comment" rows="4" maxlength="1000" required></textarea>
+        <button class="btn" type="submit">コメントを投稿</button>
+      </form>
+      <p id="comment-status" class="comment-status" role="status" aria-live="polite"></p>
+      <div id="comment-list" class="comment-list" aria-live="polite"></div>
     </div>
   </section>
 
@@ -156,21 +164,5 @@
 <footer>Made by Alex Rivera for Showcase Night</footer>
 
 <script src="script.js"></script>
-<script>
-  var disqus_config = function () {
-    var pageUrl = new URL(window.location.href);
-    pageUrl.search = '';
-    pageUrl.hash = '';
-    this.page.url = pageUrl.href;
-    this.page.identifier = 'portfolio-guestbook';
-  };
-  (function () {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://zak.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', String(Date.now()));
-    (d.head || d.body).appendChild(s);
-  })();
-</script>
-<noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
 </body>
 </html>
