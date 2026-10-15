@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>鎌山祭</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar"></div>
+<nav>
+  <div class="wrap">
+    <strong>鎌山祭</strong>
+    <a href="#about">自己紹介</a>
+    <a href="#projects">作品</a>
+    <a href="#guestbook">コメント</a>
+    <a href="#contact">連絡先</a>
+    <button id="theme" type="button" aria-label="Toggle dark mode">Dark mode</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">Grade 10 · School Showcase Night</span>
+    <div class="who">
+      <div class="avatar">
+        <img id="av" src="profile.jpg/６.jpg" alt="Profile photo of Ko Ko">
+      </div>
+      <h1>こんにちは<mark>ココです</mark>.</h1>
+    </div>
+    <p class="lead">I <span id="type"></span><span class="caret" aria-hidden="true"></span></p>
+    <p>人物ポートレートやアニメ風イラストを描いたり、日常の写真を撮ったりしています。これまで制作してきた作品のコレクションです。</p>
+    <div class="cta">
+      <a class="btn" href="#projects">作品を見る</a>
+      <a class="btn alt" href="#contact">連絡先</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="about">
+    <h2>自己紹介</h2>
+    <div class="about">
+      <div class="card">
+        <h3>初めまして！</h3>
+        <p>ミャンマー出身の　ザーニーココ(21歳)です。<br>絵を描くこと、写真を撮ること、そして音楽を聴くことが　大好きです。ぜひ僕の作品を楽しんでいただけたらうれしいです。</p>
+      </div>
+      <div class="card">
+        <ul class="facts">
+          <li><b>大学</b> 東日本国際大学</li>
+          <li><b>学年</b> １年</li>
+          <li><b>学部</b> 経済経営学部</li>
+          <li><b></b> </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>作品</h2>
+    <div class="filters" role="group" aria-label="Filter projects">
+      <button type="button" aria-pressed="true" data-f="design">アート作品</button>
+      <button type="button" aria-pressed="false" data-f="photo">写真</button>
+    </div>
+    <div class="grid">
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/１.jpg" alt="Pencil portrait drawing">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/２.jpg" alt="Pencil drawing of two people">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/３.jpg" alt="Pencil portrait drawing">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/４.jpg" alt="Close-up pencil drawing">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/５.jpg" alt="Pencil portrait drawing of a child">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/７.jpg" alt="Photograph of an anime character drawing">
+      </article>
+      <article class="proj" data-c="design">
+        <img src="profile.jpg/８.jpg" alt="Framed anime drawing">
+      </article>   
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１０.jpg" alt="Sunset over a town">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１１.jpg" alt="Sunset above rooftops">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１２.jpg" alt="Road and power lines at dusk">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１３.jpg" alt="Foggy road">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１４.jpg" alt="Pink flowers">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１５.jpg" alt="Fireworks at night">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１６.jpg" alt="Colorful fireworks in the night sky">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１７.jpg" alt="Evening sky over a road">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１８.jpg" alt="Sunlight through clouds">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/１９.jpg" alt="Close-up of green leaves">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/２０.jpg" alt="Ocean waves at the beach">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/２１.jpg" alt="Seagull by the ocean">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/２２.jpg" alt="Green spiky plant">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/２３.jpg" alt="Orange sunset over a town">
+      </article>
+      <article class="proj" data-c="photo" hidden>
+        <img src="profile.jpg/２４.jpg" alt="Blue evening sky over a landscape">
+      </article>
+    </div>
+    <dialog class="lightbox" id="lightbox" aria-label="Enlarged gallery image">
+      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close image">×</button>
+      <img id="lightbox-image" alt="">
+    </dialog>
+  </section>
+
+  <section id="guestbook">
+    <h2>コメント</h2>
+    <div class="gb">
+      <form id="gbf">
+        <label for="gn">お名前</label>
+        <input id="gn" maxlength="30" required autocomplete="off">
+        <label for="gm">コメントを残す</label>
+        <textarea id="gm" rows="3" maxlength="140" required></textarea>
+        <button class="btn" type="submit">コメントを投稿</button>
+      </form>
+      <div class="notes" id="notes" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <h2>Let's talk</h2>
+    <p>Stopped by my table? Leave me a note, ask about a project, or tell me what I should build next.</p>
+    <button class="btn" id="copy" type="button">Copy my email</button>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer>Made by Alex Rivera for Showcase Night</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
