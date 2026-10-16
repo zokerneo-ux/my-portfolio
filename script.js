@@ -75,6 +75,32 @@
   var commentsRequest=null;
   var pendingCommentDeletes=new Set();
   var pendingCommentLikes=new Set();
+  var ownedCommentsKey='portfolio-owned-comment-ids';
+  var ownedCommentIds=new Set();
+  var ownershipStorageError=false;
+
+  try{
+    var storedOwnedIds=localStorage.getItem(ownedCommentsKey);
+    if(storedOwnedIds!==null){
+      var parsedOwnedIds=JSON.parse(storedOwnedIds);
+      if(!Array.isArray(parsedOwnedIds))throw new Error('Invalid owned comment IDs');
+      parsedOwnedIds.forEach(function(id){
+        if(typeof id==='string'&&id)ownedCommentIds.add(id);
+      });
+    }
+  }catch(error){
+    ownershipStorageError=true;
+  }
+  function saveOwnedCommentIds(){
+    try{
+      localStorage.setItem(ownedCommentsKey,JSON.stringify(Array.from(ownedCommentIds)));
+      ownershipStorageError=false;
+      return true;
+    }catch(error){
+      ownershipStorageError=true;
+      return false;
+    }
+  }
 
   function validComments(rows){
     if(!Array.isArray(rows))throw new Error('Unexpected comments response');
@@ -127,17 +153,18 @@
         likeComment(comment);
       });
       actions.appendChild(like);
-      var remove=document.createElement('button');
-      remove.className='comment-delete';
-      remove.type='button';
-      remove.textContent=comment.id?'削除':'削除できません（IDなし）';
-      remove.setAttribute('aria-label',comment.id?comment.name+'のコメントを削除':'IDがないコメントは削除できません');
-      remove.disabled=!comment.id;
-      remove.addEventListener('click',function(){
-        deleteComment(comment);
-      });
       article.appendChild(content);
-      actions.appendChild(remove);
+      if(comment.id&&ownedCommentIds.has(comment.id)){
+        var remove=document.createElement('button');
+        remove.className='comment-delete';
+        remove.type='button';
+        remove.textContent='削除';
+        remove.setAttribute('aria-label',comment.name+'のコメントを削除');
+        remove.addEventListener('click',function(){
+          deleteComment(comment);
+        });
+        actions.appendChild(remove);
+      }
       article.appendChild(actions);
       commentList.appendChild(article);
     });
@@ -162,7 +189,9 @@
         renderComments();
         if(commentStatus.textContent==='コメントを読み込んでいます...'||
           commentStatus.textContent==='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。'){
-          commentStatus.textContent='';
+          commentStatus.textContent=ownershipStorageError
+            ?'このブラウザーで作成したコメントを記録できません。削除ボタンを利用できない場合があります。'
+            :'';
         }
         return true;
       }catch(error){
@@ -182,9 +211,20 @@
   document.addEventListener('visibilitychange',function(){
     if(!document.hidden)loadComments();
   });
+  addEventListener('storage',function(event){
+    if(event.key!==ownedCommentsKey)return;
+    try{
+      var updatedIds=event.newValue?JSON.parse(event.newValue):[];
+      if(!Array.isArray(updatedIds))throw new Error('Invalid owned comment IDs');
+      ownedCommentIds=new Set(updatedIds.filter(function(id){return typeof id==='string'&&id}));
+      renderComments();
+    }catch(error){
+      commentStatus.textContent='このブラウザーのコメント所有情報を読み込めませんでした。';
+    }
+  });
   async function deleteComment(comment){
-    if(!comment.id){
-      commentStatus.textContent='このコメントには一意のIDがないため削除できません。';
+    if(!comment.id||!ownedCommentIds.has(comment.id)){
+      commentStatus.textContent='このブラウザーで作成したコメントだけ削除できます。';
       return;
     }
     if(pendingCommentDeletes.has(comment.id))return;
@@ -197,11 +237,13 @@
       });
       if(!response.ok)throw new Error('Comment deletion failed with status '+response.status);
       comments=comments.filter(function(item){return item.id!==comment.id});
+      ownedCommentIds.delete(comment.id);
+      var ownershipSaved=saveOwnedCommentIds();
       pendingCommentDeletes.delete(comment.id);
       renderComments();
       var refreshed=await refreshComments();
       commentStatus.textContent=refreshed
-        ?'コメントを削除しました。'
+        ?(ownershipSaved?'コメントを削除しました。':'コメントを削除しましたが、所有情報を保存できませんでした。')
         :'コメントを削除しましたが、一覧を更新できませんでした。';
     }catch(error){
       pendingCommentDeletes.delete(comment.id);
@@ -248,13 +290,15 @@
       body:JSON.stringify({data:{id:id,name:name,comment:text,likes:0}})
     }).then(function(response){
       if(!response.ok)throw new Error('Comment submission failed with status '+response.status);
+      ownedCommentIds.add(id);
+      var ownershipSaved=saveOwnedCommentIds();
       comments.unshift({id:id,name:name,text:text,likes:0});
       renderComments();
       commentName.value='';
       commentText.value='';
       return refreshComments().then(function(loaded){
         commentStatus.textContent=loaded
-          ?'コメントを投稿しました。'
+          ?(ownershipSaved?'コメントを投稿しました。':'コメントを投稿しましたが、このブラウザーで削除できるよう記録できませんでした。')
           :'コメントを投稿しましたが、最新の一覧を読み込めませんでした。';
       });
     }).catch(function(error){
