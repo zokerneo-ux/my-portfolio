@@ -70,6 +70,7 @@
   var commentName=document.getElementById('comment-name');
   var commentText=document.getElementById('comment-text');
   var commentSubmit=commentForm.querySelector('button[type="submit"]');
+  var commentRefresh=document.getElementById('comment-refresh');
   var commentsApi='https://sheetdb.io/api/v1/vigiabnq33hmu';
   var comments=[];
   var commentsRequest=null;
@@ -169,12 +170,10 @@
       commentList.appendChild(article);
     });
   }
-  async function refreshComments(){
-    if(commentsRequest)await commentsRequest;
-    return loadComments();
-  }
-  function loadComments(){
+  function loadComments(manual){
     if(commentsRequest)return commentsRequest;
+    commentRefresh.disabled=true;
+    if(manual)commentStatus.textContent='コメントを更新しています...';
     commentsRequest=(async function(){
       try{
         var response=await fetch(commentsApi);
@@ -187,7 +186,9 @@
         });
         comments=updatedComments;
         renderComments();
-        if(commentStatus.textContent==='コメントを読み込んでいます...'||
+        if(manual){
+          commentStatus.textContent='コメント一覧を更新しました。';
+        }else if(commentStatus.textContent==='コメントを読み込んでいます...'||
           commentStatus.textContent==='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。'){
           commentStatus.textContent=ownershipStorageError
             ?'このブラウザーで作成したコメントを記録できません。削除ボタンを利用できない場合があります。'
@@ -199,17 +200,15 @@
         return false;
       }finally{
         commentsRequest=null;
+        commentRefresh.disabled=false;
       }
     })();
     return commentsRequest;
   }
   commentStatus.textContent='コメントを読み込んでいます...';
-  loadComments();
-  setInterval(function(){
-    if(!document.hidden)loadComments();
-  },5000);
-  document.addEventListener('visibilitychange',function(){
-    if(!document.hidden)loadComments();
+  loadComments(false);
+  commentRefresh.addEventListener('click',function(){
+    loadComments(true);
   });
   addEventListener('storage',function(event){
     if(event.key!==ownedCommentsKey)return;
@@ -241,13 +240,12 @@
       var ownershipSaved=saveOwnedCommentIds();
       pendingCommentDeletes.delete(comment.id);
       renderComments();
-      var refreshed=await refreshComments();
-      commentStatus.textContent=refreshed
-        ?(ownershipSaved?'コメントを削除しました。':'コメントを削除しましたが、所有情報を保存できませんでした。')
-        :'コメントを削除しましたが、一覧を更新できませんでした。';
+      commentStatus.textContent=ownershipSaved
+        ?'コメントを削除しました。'
+        :'コメントを削除しましたが、所有情報を保存できませんでした。';
     }catch(error){
       pendingCommentDeletes.delete(comment.id);
-      await refreshComments();
+      renderComments();
       commentStatus.textContent='コメントを削除できませんでした。時間をおいてもう一度お試しください。';
     }
   }
@@ -267,13 +265,11 @@
       if(typeof result.updated==='number'&&result.updated<1)throw new Error('No comment was updated');
       commentStatus.textContent='いいねしました。';
       pendingCommentLikes.delete(comment.id);
-      await refreshComments();
     }catch(error){
       comment.likes=Math.max(0,comment.likes-1);
       pendingCommentLikes.delete(comment.id);
       renderComments();
       commentStatus.textContent='いいねを保存できませんでした。時間をおいてもう一度お試しください。';
-      await refreshComments();
     }
   }
   commentForm.addEventListener('submit',function(event){
@@ -296,11 +292,9 @@
       renderComments();
       commentName.value='';
       commentText.value='';
-      return refreshComments().then(function(loaded){
-        commentStatus.textContent=loaded
-          ?(ownershipSaved?'コメントを投稿しました。':'コメントを投稿しましたが、このブラウザーで削除できるよう記録できませんでした。')
-          :'コメントを投稿しましたが、最新の一覧を読み込めませんでした。';
-      });
+      commentStatus.textContent=ownershipSaved
+        ?'コメントを投稿しました。'
+        :'コメントを投稿しましたが、このブラウザーで削除できるよう記録できませんでした。';
     }).catch(function(error){
       commentStatus.textContent='コメントを投稿できませんでした。時間をおいてもう一度お試しください。';
     }).then(function(){

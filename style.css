@@ -113,6 +113,9 @@ footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem
 .comment-form input,.comment-form textarea{font:inherit;font-size:1rem;padding:.65rem .8rem;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:100%}
 .comment-form textarea{resize:vertical}
 .comment-form .btn{justify-self:start}
+.comment-refresh{font:500 .9rem var(--head);margin-top:1rem;padding:.4rem .75rem;border:2px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
+.comment-refresh:hover:not(:disabled){background:var(--mark);color:#14291d}
+.comment-refresh:disabled{cursor:wait;opacity:.6}
 .comment-status{min-height:1.6rem;margin:.8rem 0;font-family:var(--head);font-size:.9rem;color:var(--muted)}
 .comment-list{display:grid;gap:1rem}
 .comment{display:flex;align-items:flex-start;gap:1rem;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1rem 1.2rem;overflow-wrap:anywhere}
