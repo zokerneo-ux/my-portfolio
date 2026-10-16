@@ -117,13 +117,17 @@ footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem
 .comment-list{display:grid;gap:1rem}
 .comment{display:flex;align-items:flex-start;gap:1rem;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1rem 1.2rem;overflow-wrap:anywhere}
 .comment-content{flex:1;min-width:0}
+.comment-actions{display:flex;flex:none;align-items:center;gap:.5rem}
 .comment p{margin:0}
 .comment-author{display:block;margin-top:.5rem;font-family:var(--head);font-size:.9rem}
-.comment-delete{flex:none;font:500 .85rem var(--head);padding:.3rem .65rem;border:2px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
+.comment-like,.comment-delete{font:500 .85rem var(--head);padding:.3rem .65rem;border:2px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
+.comment-like:hover:not(:disabled){background:var(--mark);color:#14291d}
+.comment-delete{flex:none}
 .comment-delete:hover:not(:disabled){background:var(--mark);color:#14291d}
-.comment-delete:disabled{cursor:not-allowed;opacity:.6}
+.comment-like:disabled,.comment-delete:disabled{cursor:not-allowed;opacity:.6}
 .hint{font-size:.9rem;color:var(--muted);margin:.3rem 0 0}
 @media (max-width:640px){.skill2{grid-template-columns:7rem 1fr 2.5rem}}
+@media (max-width:420px){.comment{gap:.5rem;padding:.8rem}.comment-actions{flex-direction:column;align-items:stretch}}
 .who{display:flex;align-items:center;gap:1.3rem;flex-wrap:wrap;margin:1.2rem 0 1rem}
 .who h1{margin:0;font-size:clamp(1.5rem,8vw,4.5rem);white-space:nowrap}
 .avatar{position:relative;flex:none;width:clamp(6.5rem,20vw,9.5rem);aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--card);box-shadow:5px 5px 0 var(--line);overflow:hidden;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:2.2rem;color:var(--muted)}

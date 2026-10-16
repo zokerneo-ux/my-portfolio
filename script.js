@@ -74,6 +74,7 @@
   var comments=[];
   var commentsRequest=null;
   var pendingCommentDeletes=new Set();
+  var pendingCommentLikes=new Set();
 
   function validComments(rows){
     if(!Array.isArray(rows))throw new Error('Unexpected comments response');
@@ -83,7 +84,8 @@
       return {
         id:typeof row.id==='string'||typeof row.id==='number'?String(row.id).trim():'',
         name:row.name.trim(),
-        text:row.comment.trim()
+        text:row.comment.trim(),
+        likes:Number.isFinite(Number(row.likes))&&Number(row.likes)>=0?Math.floor(Number(row.likes)):0
       };
     }).filter(function(comment){
       return comment.name&&comment.text;
@@ -113,6 +115,18 @@
       content.className='comment-content';
       content.appendChild(text);
       content.appendChild(author);
+      var actions=document.createElement('div');
+      actions.className='comment-actions';
+      var like=document.createElement('button');
+      like.className='comment-like';
+      like.type='button';
+      like.textContent='Like ('+comment.likes+')';
+      like.setAttribute('aria-label','Like '+comment.name+'’s comment, '+comment.likes+' likes');
+      like.disabled=!comment.id||pendingCommentLikes.has(comment.id);
+      like.addEventListener('click',function(){
+        likeComment(comment);
+      });
+      actions.appendChild(like);
       var remove=document.createElement('button');
       remove.className='comment-delete';
       remove.type='button';
@@ -123,7 +137,8 @@
         deleteComment(comment);
       });
       article.appendChild(content);
-      article.appendChild(remove);
+      actions.appendChild(remove);
+      article.appendChild(actions);
       commentList.appendChild(article);
     });
   }
@@ -137,7 +152,13 @@
       try{
         var response=await fetch(commentsApi);
         if(!response.ok)throw new Error('Comments request failed with status '+response.status);
-        comments=validComments(await response.json());
+        var updatedComments=validComments(await response.json());
+        updatedComments.forEach(function(comment){
+          if(!pendingCommentLikes.has(comment.id))return;
+          var current=comments.find(function(item){return item.id===comment.id});
+          if(current)comment.likes=current.likes;
+        });
+        comments=updatedComments;
         renderComments();
         if(commentStatus.textContent==='コメントを読み込んでいます...'||
           commentStatus.textContent==='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。'){
@@ -188,6 +209,31 @@
       commentStatus.textContent='コメントを削除できませんでした。時間をおいてもう一度お試しください。';
     }
   }
+  async function likeComment(comment){
+    if(!comment.id||pendingCommentLikes.has(comment.id))return;
+    pendingCommentLikes.add(comment.id);
+    comment.likes+=1;
+    renderComments();
+    try{
+      var response=await fetch(commentsApi+'/id/'+encodeURIComponent(comment.id)+'?casesensitive=true',{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({data:{likes:comment.likes}})
+      });
+      if(!response.ok)throw new Error('Like update failed with status '+response.status);
+      var result=await response.json();
+      if(typeof result.updated==='number'&&result.updated<1)throw new Error('No comment was updated');
+      commentStatus.textContent='いいねしました。';
+      pendingCommentLikes.delete(comment.id);
+      await refreshComments();
+    }catch(error){
+      comment.likes=Math.max(0,comment.likes-1);
+      pendingCommentLikes.delete(comment.id);
+      renderComments();
+      commentStatus.textContent='いいねを保存できませんでした。時間をおいてもう一度お試しください。';
+      await refreshComments();
+    }
+  }
   commentForm.addEventListener('submit',function(event){
     event.preventDefault();
     var name=commentName.value.trim();
@@ -195,13 +241,14 @@
     if(!name||!text)return;
     commentSubmit.disabled=true;
     commentStatus.textContent='コメントを投稿しています...';
+    var id=createCommentId();
     fetch(commentsApi,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({data:{id:createCommentId(),name:name,comment:text}})
+      body:JSON.stringify({data:{id:id,name:name,comment:text,likes:0}})
     }).then(function(response){
       if(!response.ok)throw new Error('Comment submission failed with status '+response.status);
-      comments.unshift({name:name,text:text});
+      comments.unshift({id:id,name:name,text:text,likes:0});
       renderComments();
       commentName.value='';
       commentText.value='';
