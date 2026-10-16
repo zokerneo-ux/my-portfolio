@@ -115,9 +115,13 @@ footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem
 .comment-form .btn{justify-self:start}
 .comment-status{min-height:1.6rem;margin:.8rem 0;font-family:var(--head);font-size:.9rem;color:var(--muted)}
 .comment-list{display:grid;gap:1rem}
-.comment{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1rem 1.2rem;overflow-wrap:anywhere}
+.comment{display:flex;align-items:flex-start;gap:1rem;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1rem 1.2rem;overflow-wrap:anywhere}
+.comment-content{flex:1;min-width:0}
 .comment p{margin:0}
 .comment-author{display:block;margin-top:.5rem;font-family:var(--head);font-size:.9rem}
+.comment-delete{flex:none;font:500 .85rem var(--head);padding:.3rem .65rem;border:2px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);cursor:pointer}
+.comment-delete:hover:not(:disabled){background:var(--mark);color:#14291d}
+.comment-delete:disabled{cursor:not-allowed;opacity:.6}
 .hint{font-size:.9rem;color:var(--muted);margin:.3rem 0 0}
 @media (max-width:640px){.skill2{grid-template-columns:7rem 1fr 2.5rem}}
 .who{display:flex;align-items:center;gap:1.3rem;flex-wrap:wrap;margin:1.2rem 0 1rem}

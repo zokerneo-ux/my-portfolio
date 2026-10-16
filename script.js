@@ -72,20 +72,36 @@
   var commentSubmit=commentForm.querySelector('button[type="submit"]');
   var commentsApi='https://sheetdb.io/api/v1/vigiabnq33hmu';
   var comments=[];
+  var commentsRequest=null;
+  var pendingCommentDeletes=new Set();
 
   function validComments(rows){
     if(!Array.isArray(rows))throw new Error('Unexpected comments response');
     return rows.filter(function(row){
       return row&&typeof row.name==='string'&&typeof row.comment==='string';
     }).map(function(row){
-      return {name:row.name.trim(),text:row.comment.trim()};
+      return {
+        id:typeof row.id==='string'||typeof row.id==='number'?String(row.id).trim():'',
+        name:row.name.trim(),
+        text:row.comment.trim()
+      };
     }).filter(function(comment){
       return comment.name&&comment.text;
     });
   }
+  function createCommentId(){
+    if(window.crypto&&typeof window.crypto.randomUUID==='function')return window.crypto.randomUUID();
+    if(window.crypto&&typeof window.crypto.getRandomValues==='function'){
+      return Array.from(window.crypto.getRandomValues(new Uint32Array(4)),function(value){
+        return value.toString(16);
+      }).join('-');
+    }
+    return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  }
   function renderComments(){
     commentList.textContent='';
     comments.forEach(function(comment){
+      if(comment.id&&pendingCommentDeletes.has(comment.id))return;
       var article=document.createElement('article');
       article.className='comment';
       var text=document.createElement('p');
@@ -93,26 +109,85 @@
       var author=document.createElement('b');
       author.className='comment-author';
       author.textContent='– '+comment.name;
-      article.appendChild(text);
-      article.appendChild(author);
+      var content=document.createElement('div');
+      content.className='comment-content';
+      content.appendChild(text);
+      content.appendChild(author);
+      var remove=document.createElement('button');
+      remove.className='comment-delete';
+      remove.type='button';
+      remove.textContent=comment.id?'削除':'削除できません（IDなし）';
+      remove.setAttribute('aria-label',comment.id?comment.name+'のコメントを削除':'IDがないコメントは削除できません');
+      remove.disabled=!comment.id;
+      remove.addEventListener('click',function(){
+        deleteComment(comment);
+      });
+      article.appendChild(content);
+      article.appendChild(remove);
       commentList.appendChild(article);
     });
   }
-  async function loadComments(){
-    try{
-      var response=await fetch(commentsApi);
-      if(!response.ok)throw new Error('Comments request failed with status '+response.status);
-      comments=validComments(await response.json());
-      renderComments();
-      commentStatus.textContent='';
-      return true;
-    }catch(error){
-      commentStatus.textContent='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。';
-      return false;
-    }
+  async function refreshComments(){
+    if(commentsRequest)await commentsRequest;
+    return loadComments();
+  }
+  function loadComments(){
+    if(commentsRequest)return commentsRequest;
+    commentsRequest=(async function(){
+      try{
+        var response=await fetch(commentsApi);
+        if(!response.ok)throw new Error('Comments request failed with status '+response.status);
+        comments=validComments(await response.json());
+        renderComments();
+        if(commentStatus.textContent==='コメントを読み込んでいます...'||
+          commentStatus.textContent==='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。'){
+          commentStatus.textContent='';
+        }
+        return true;
+      }catch(error){
+        commentStatus.textContent='コメントを読み込めませんでした。時間をおいてページを再読み込みしてください。';
+        return false;
+      }finally{
+        commentsRequest=null;
+      }
+    })();
+    return commentsRequest;
   }
   commentStatus.textContent='コメントを読み込んでいます...';
   loadComments();
+  setInterval(function(){
+    if(!document.hidden)loadComments();
+  },5000);
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden)loadComments();
+  });
+  async function deleteComment(comment){
+    if(!comment.id){
+      commentStatus.textContent='このコメントには一意のIDがないため削除できません。';
+      return;
+    }
+    if(pendingCommentDeletes.has(comment.id))return;
+    pendingCommentDeletes.add(comment.id);
+    renderComments();
+    commentStatus.textContent='コメントを削除しています...';
+    try{
+      var response=await fetch(commentsApi+'/id/'+encodeURIComponent(comment.id)+'?limit=1&casesensitive=true',{
+        method:'DELETE'
+      });
+      if(!response.ok)throw new Error('Comment deletion failed with status '+response.status);
+      comments=comments.filter(function(item){return item.id!==comment.id});
+      pendingCommentDeletes.delete(comment.id);
+      renderComments();
+      var refreshed=await refreshComments();
+      commentStatus.textContent=refreshed
+        ?'コメントを削除しました。'
+        :'コメントを削除しましたが、一覧を更新できませんでした。';
+    }catch(error){
+      pendingCommentDeletes.delete(comment.id);
+      await refreshComments();
+      commentStatus.textContent='コメントを削除できませんでした。時間をおいてもう一度お試しください。';
+    }
+  }
   commentForm.addEventListener('submit',function(event){
     event.preventDefault();
     var name=commentName.value.trim();
@@ -123,14 +198,14 @@
     fetch(commentsApi,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({data:{name:name,comment:text}})
+      body:JSON.stringify({data:{id:createCommentId(),name:name,comment:text}})
     }).then(function(response){
       if(!response.ok)throw new Error('Comment submission failed with status '+response.status);
       comments.unshift({name:name,text:text});
       renderComments();
       commentName.value='';
       commentText.value='';
-      return loadComments().then(function(loaded){
+      return refreshComments().then(function(loaded){
         commentStatus.textContent=loaded
           ?'コメントを投稿しました。'
           :'コメントを投稿しましたが、最新の一覧を読み込めませんでした。';
