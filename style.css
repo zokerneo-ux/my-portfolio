@@ -23,11 +23,11 @@ body{
   margin:0;color:var(--ink);background-color:var(--paper);
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:28px 28px;
-  font-family:var(--body);font-size:1.15rem;line-height:1.65;
+  font-family:var(--body);font-size:clamp(1rem,1.4vw,1.15rem);line-height:1.65;
 }
 a{color:inherit}
 :focus-visible{outline:3px solid var(--pencil);outline-offset:3px}
-.wrap{max-width:60rem;margin:0 auto;padding:0 1.25rem}
+.wrap{width:100%;max-width:60rem;margin:0 auto;padding:0 clamp(1rem,3.2vw,1.25rem)}
 nav{
   position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
   background:var(--paper);border-bottom:2px solid var(--line);
@@ -38,7 +38,7 @@ nav a{font-family:var(--head);font-weight:500;text-decoration:none;font-size:.95
 nav a:hover{text-decoration:underline;text-decoration-color:var(--pencil);text-underline-offset:4px}
 #theme{font:inherit;font-family:var(--head);font-size:.85rem;background:none;color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:.2rem .6rem;cursor:pointer}
 
-.hero{padding:4rem 0 3rem}
+.hero{padding:clamp(2.5rem,7vw,4rem) 0 clamp(2rem,5vw,3rem)}
 .tag{display:inline-block;font-family:var(--head);font-weight:500;font-size:.95rem;border:0;background:var(--mark);color:#14291d;padding:.4rem 1.1rem;border-radius:999px;transform:rotate(-2deg)}
 h1{font-family:var(--head);font-weight:800;font-size:clamp(3rem,11vw,7rem);line-height:.95;margin:1.2rem 0 1rem;letter-spacing:-.03em}
 h1 mark{background:linear-gradient(transparent 55%,var(--mark) 55%);color:inherit;padding:0 .1em}
@@ -48,8 +48,8 @@ h1 mark{background:linear-gradient(transparent 55%,var(--mark) 55%);color:inheri
 .btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
 .btn.alt{background:var(--card);color:var(--ink)}
 
-section{padding:3rem 0}
-h2{font-family:var(--head);font-weight:800;font-size:2rem;margin:0 0 1.5rem;letter-spacing:-.02em}
+section{padding:clamp(2.25rem,5vw,3rem) 0}
+h2{font-family:var(--head);font-weight:800;font-size:clamp(1.65rem,4vw,2rem);margin:0 0 1.5rem;letter-spacing:-.02em}
 .about{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
 .card{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:1.3rem}
 .card h3{font-family:var(--head);margin:0 0 .4rem;font-size:1.25rem}
@@ -83,7 +83,19 @@ h2{font-family:var(--head);font-weight:800;font-size:2rem;margin:0 0 1.5rem;lett
 #toast{min-height:1.6rem;margin-top:1rem;font-family:var(--head);color:var(--pencil)}
 footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem}
 
-@media (max-width:640px){.about{grid-template-columns:1fr}.hero{padding-top:2.5rem}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}}
+@media (max-width:720px){.about{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .hero{padding-top:2.5rem}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+}
+@media (max-width:420px){
+  nav .wrap{gap:.6rem .85rem}
+  nav a{font-size:.9rem}
+  .who{gap:.8rem}
+  .who h1{white-space:normal}
+  .social-link{gap:.65rem}
+  .social-link small{font-size:.8rem}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 @keyframes pop{from{opacity:0;transform:translateY(14px) rotate(-1deg)}to{opacity:1;transform:none}}
 .hero .wrap>*{animation:pop .5s both}
@@ -108,12 +120,12 @@ footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem
 .lightbox-close{position:absolute;top:1rem;right:1.25rem;border:0;background:transparent;color:white;font:2.5rem/1 Arial,sans-serif;cursor:pointer}
 .lightbox-close:focus-visible{outline-color:white}
 .social-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;max-width:54rem;margin:2rem auto 0;text-align:left}
-.social-link{display:flex;align-items:center;gap:.85rem;min-width:0;padding:1rem;background:var(--card);border:2px solid var(--line);border-radius:12px;box-shadow:4px 4px 0 var(--line);text-decoration:none;transition:transform .15s,box-shadow .15s}
+.social-link{display:flex;align-items:center;gap:.85rem;min-width:0;min-height:5.25rem;padding:clamp(.75rem,2vw,1rem);background:var(--card);border:2px solid var(--line);border-radius:12px;box-shadow:4px 4px 0 var(--line);text-decoration:none;transition:transform .15s,box-shadow .15s}
 .social-link:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
 .social-link>span:nth-child(2){display:grid;gap:.1rem;min-width:0}
 .social-link b{font-family:var(--head);font-size:1rem}
 .social-link small{color:var(--muted);font-size:.85rem}
-.social-icon{display:grid;place-items:center;flex:none;width:2.8rem;height:2.8rem;border-radius:10px;background:#06c755}
+.social-icon{display:grid;place-items:center;flex:none;width:clamp(2.5rem,4vw,2.8rem);height:clamp(2.5rem,4vw,2.8rem);border-radius:10px;background:#06c755}
 .social-icon svg{width:1.8rem;height:1.8rem;fill:white}
 .line-icon svg .line-glyph{fill:none;stroke:#06c755;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .facebook-icon{background:#1877f2}
@@ -123,7 +135,8 @@ footer{padding:2rem 0 3rem;text-align:center;color:var(--muted);font-size:.95rem
 .instagram-icon svg .instagram-dot{fill:white;stroke:none}
 .social-arrow{margin-left:auto;color:var(--muted);font-size:1.1rem}
 @media (max-width:640px){.skill2{grid-template-columns:7rem 1fr 2.5rem}}
-@media (max-width:640px){.social-links{grid-template-columns:1fr;max-width:25rem;margin-top:1.5rem}}
+@media (max-width:540px){.social-links{grid-template-columns:1fr;max-width:25rem;margin-top:1.5rem}}
+@media (min-width:541px) and (max-width:920px){.social-links{grid-template-columns:repeat(2,minmax(0,1fr));max-width:40rem}}
 .who{display:flex;align-items:center;gap:1.3rem;flex-wrap:wrap;margin:1.2rem 0 1rem}
 .who h1{margin:0;font-size:clamp(1.5rem,8vw,4.5rem);white-space:nowrap}
 .avatar{position:relative;flex:none;width:clamp(6.5rem,20vw,9.5rem);aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--card);box-shadow:5px 5px 0 var(--line);overflow:hidden;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:2.2rem;color:var(--muted)}
